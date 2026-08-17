@@ -1,4 +1,9 @@
-# Example Infix Spin
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/logo-dark.png">
+    <img src="doc/logo.png" alt="ExampleOS -- an Infix spin" width="420">
+  </picture>
+</p>
 
 This is a *spin* of [Infix OS](https://github.com/kernelkit/infix) a
 tiny skeleton repo showing how to make Infix your own without forking
@@ -76,8 +81,8 @@ brings its own QEMU and Python tooling.  Tests describe the *logical*
 topology they need (`topology.dot`) and the harness maps it onto the
 virtual network it starts, so nothing here depends on real hardware.
 
-The result of the last run can be rendered as a PDF, branded with the
-logo in `doc/` (swap it for your own, and see `LOGO` in the Makefile if
+The result of the last run can be rendered as a PDF, branded with
+`doc/logo.png` (swap it for your own, and see `LOGO` in the Makefile if
 you want it placed differently):
 
 ```bash
