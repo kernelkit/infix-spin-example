@@ -76,8 +76,18 @@ brings its own QEMU and Python tooling.  Tests describe the *logical*
 topology they need (`topology.dot`) and the harness maps it onto the
 virtual network it starts, so nothing here depends on real hardware.
 
-The same two commands run in CI, on a stock GitHub runner, see
-`.github/workflows/build.yml`.
+The result of the last run can be rendered as a PDF, branded with the
+logo in `doc/` (swap it for your own, and see `LOGO` in the Makefile if
+you want it placed differently):
+
+```bash
+gem install asciidoctor-pdf
+make test-report          # -> output/images/test-report.pdf
+```
+
+The same commands run in CI, on a stock GitHub runner, see
+`.github/workflows/build.yml`.  The report is uploaded along with the
+images.
 
 ## Learn More
 

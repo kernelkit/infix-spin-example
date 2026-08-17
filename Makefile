@@ -6,6 +6,10 @@ export BR2_EXTERNAL := $(CURDIR)/infix:$(CURDIR)
 export TESTS             := $(CURDIR)/test/case/all.yaml
 export NINEPM_PROJ_CONFIG := $(CURDIR)/test/9pm-proj.yaml
 
+# Brand the generated test report with our logo instead of the Infix one.
+# The bracket suffix is an Asciidoctor image spec, tweak to taste.
+export LOGO := $(CURDIR)/doc/logo.png[top=40%, align=right, pdfwidth=10cm]
+
 O      ?= $(CURDIR)/output
 config := $(O)/.config
 bmake   = $(MAKE) -C infix/buildroot O=$(O) $1
@@ -30,6 +34,11 @@ $(config):
 test: | infix/buildroot/Makefile
 	@+$(call bmake,$@)
 
+# Render the result of the last `make test` as output/images/test-report.pdf.
+# Needs asciidoctor-pdf: gem install asciidoctor-pdf
+test-report: | infix/buildroot/Makefile
+	@+$(call bmake,$@)
+
 # Any other target (menuconfig, clean, ...) is passed to Buildroot.
 %: | infix/buildroot/Makefile
 	@+$(call bmake,$@)
@@ -46,4 +55,4 @@ defconfigs-generate: infix/buildroot/Makefile
 		-c config-snippets/x86_64.conf \
 		-o configs/x86_64_defconfig
 
-.PHONY: all test defconfigs-generate
+.PHONY: all test test-report defconfigs-generate

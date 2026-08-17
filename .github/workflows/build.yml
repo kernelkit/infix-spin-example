@@ -32,6 +32,9 @@ jobs:
             autopoint bison flex autoconf automake \
             mtools
 
+      - name: Install asciidoctor-pdf
+        run: sudo gem install --no-document asciidoctor-pdf
+
       # Full history, the OS version comes from `git describe` here.
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,7 +55,13 @@ jobs:
         if: always()
         run: cat infix/test/.log/last/result-gh.md >> $GITHUB_STEP_SUMMARY
 
+      # Lands in output/images/, uploaded with the rest below.
+      - name: Test Report x86_64
+        if: always()
+        run: make test-report
+
       - name: Upload Images
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: example-os-x86_64
