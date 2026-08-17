@@ -1,0 +1,59 @@
+name: Build & Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  x86_64:
+    name: ExampleOS x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc binutils build-essential bzip2 cpio \
+            diffutils file findutils git gzip \
+            libncurses-dev libssl-dev perl patch \
+            python3 rsync sed tar unzip wget \
+            autopoint bison flex autoconf automake \
+            mtools
+
+      # Full history, the OS version comes from `git describe` here.
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Configure x86_64
+        run: make x86_64_defconfig
+
+      - name: Build x86_64
+        run: make
+
+      - name: Test x86_64
+        run: make test
+
+      - name: Publish Test Result
+        if: always()
+        run: cat infix/test/.log/last/result-gh.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Images
+        uses: actions/upload-artifact@v7
+        with:
+          name: example-os-x86_64
+          path: output/images/

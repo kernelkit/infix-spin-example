@@ -11,6 +11,8 @@ on top:
     this repo and supervised by finit (`package/`, `src/`)
   * **Files** — a rootfs overlay for configuration and service settings
     (`board/common/rootfs/`)
+  * **Tests** — a regression test for the daemon, run in QEMU by Infix's
+    test harness (`test/`)
 
 When a new Infix release comes out, you bump the submodule and rebuild.
 No fork, no drift, no merge conflicts.  Clone it, rename a few things,
@@ -57,6 +59,25 @@ example-os:~$ sudo grep hello-world /var/log/syslog
 ```
 
 That's it. Have a look around and make it your own.
+
+## Test
+
+Infix comes with a test harness that boots the image in QEMU and pokes
+at it over SSH and NETCONF.  A spin can reuse it for its own tests; this
+one has a single case that checks the `hello-world` daemon, see
+`test/case/hello-world/`:
+
+```bash
+make test
+```
+
+Docker or Podman is required, the harness runs inside a container that
+brings its own QEMU and Python tooling.  Tests describe the *logical*
+topology they need (`topology.dot`) and the harness maps it onto the
+virtual network it starts, so nothing here depends on real hardware.
+
+The same two commands run in CI, on a stock GitHub runner, see
+`.github/workflows/build.yml`.
 
 ## Learn More
 

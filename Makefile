@@ -2,6 +2,10 @@
 # stacked: Infix first, then this repo (branding, overlay, packages).
 export BR2_EXTERNAL := $(CURDIR)/infix:$(CURDIR)
 
+# Run our tests instead of Infix's, using Infix's test harness, see test/
+export TESTS             := $(CURDIR)/test/case/all.yaml
+export NINEPM_PROJ_CONFIG := $(CURDIR)/test/9pm-proj.yaml
+
 O      ?= $(CURDIR)/output
 config := $(O)/.config
 bmake   = $(MAKE) -C infix/buildroot O=$(O) $1
@@ -17,6 +21,13 @@ $(config):
 	@exit 1
 
 %_defconfig: configs/%_defconfig
+	@+$(call bmake,$@)
+
+# Boot the image in QEMU and run $(TESTS) against it.  Needs Docker or
+# Podman; the harness pulls a container with QEMU and the test tooling.
+# Explicit rule, since the catch-all below would find the test/ directory
+# and think there is nothing to do.
+test: | infix/buildroot/Makefile
 	@+$(call bmake,$@)
 
 # Any other target (menuconfig, clean, ...) is passed to Buildroot.
@@ -35,4 +46,4 @@ defconfigs-generate: infix/buildroot/Makefile
 		-c config-snippets/x86_64.conf \
 		-o configs/x86_64_defconfig
 
-.PHONY: all defconfigs-generate
+.PHONY: all test defconfigs-generate

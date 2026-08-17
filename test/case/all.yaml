@@ -1,0 +1,11 @@
+# Test suite for this spin.  `make test` runs it instead of Infix's own
+# suite, see TESTS in the top-level Makefile.  Add a line per test case;
+# to also run (parts of) the Infix suite, point at it with a relative
+# path, e.g.:
+#
+#   - name: "System"
+#     suite: ../../infix/test/case/system/all.yaml
+#
+---
+- name: "Hello World Daemon"
+  case: hello-world/test.py
