@@ -1,0 +1,51 @@
+module example-hello {
+  yang-version 1.1;
+  namespace "urn:example:params:xml:ns:yang:example-hello";
+  prefix example-hello;
+
+  organization "Example Inc.";
+  contact      "mailto:support@example.com";
+
+  description
+    "Configuration and state for the hello-world example daemon.
+
+     This model is the whole point of the example.  It is defined here in
+     the spin, loaded into sysrepo at build time (see
+     package/hello-world/hello-world.mk), and served by the daemon itself
+     (see src/hello-world/hello-world.c).  Nothing else needs to know
+     about it: the CLI, NETCONF, and RESTCONF are all generated from the
+     models sysrepo has loaded, so this file is what makes
+
+         set hello audience there
+
+     a valid command.";
+
+  revision 2026-08-26 {
+    description "Initial revision.";
+  }
+
+  container hello {
+    description "Who the hello-world daemon greets, and how often it has.";
+
+    leaf audience {
+      type string {
+        length "1..64";
+      }
+      default "world";
+      description
+        "Who to greet.  The daemon logs 'Hello <audience>!' to the system
+         log once a minute.  Being a leaf with a default, it needs no
+         entry in the startup configuration to have a value.";
+    }
+
+    leaf greetings {
+      config false;
+      type uint64;
+      description
+        "Number of greetings logged since the daemon started.  Marked
+         'config false', so this is operational state: the daemon answers
+         for it live, it is never stored, and the CLI will not offer it
+         for editing in configure mode.";
+    }
+  }
+}
