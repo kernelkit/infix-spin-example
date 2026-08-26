@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Adds 'show hello' to the operational mode CLI.
+
+    klish reads every XML file in /etc/klish and merges them, so
+    re-declaring VIEW main and the show command here extends Infix's CLI
+    rather than replacing it.  Infix does the same thing internally, see
+    infix/src/klish-plugin-infix/xml/containers.xml.
+
+    Note what is *not* here: nothing for 'set hello audience ...'.
+    Configure mode is generated from the YANG models sysrepo has loaded,
+    so our model turns up there, with help texts and tab completion, the
+    moment it is installed.
+-->
+<KLISH
+  xmlns="https://klish.libcode.org/klish3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://src.libcode.org/pkun/klish/src/master/klish.xsd">
+
+<VIEW name="main">
+
+<COMMAND name="show" help="Show system status and configuration files" mode="switch">
+
+  <COMMAND name="hello" help="Show hello-world daemon status">
+    <ACTION sym="script">
+      copy operational -x /example-hello:hello | jq -r '.["example-hello:hello"]
+        | "audience:  \(.audience)", "greetings: \(.greetings)"'
+    </ACTION>
+  </COMMAND>
+
+</COMMAND>
+
+</VIEW>
+</KLISH>
