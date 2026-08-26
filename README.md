@@ -14,7 +14,9 @@ on top:
     `config-snippets/`
   * **Packages** — an example `hello-world` daemon, built from source in
     this repo and supervised by finit (`package/`, `src/`)
-  * **Files** — a rootfs overlay for configuration and service settings
+  * **Models** — a YANG model for that daemon, which is all it takes to
+    get it into the CLI, NETCONF, and RESTCONF (`yang/`)
+  * **Files** — a rootfs overlay for service settings and a CLI snippet
     (`board/common/rootfs/`)
   * **Tests** — a regression test for the daemon, run in QEMU by Infix's
     test harness (`test/`)
@@ -65,6 +67,38 @@ example-os:~$ sudo grep hello-world /var/log/syslog
 
 That's it. Have a look around and make it your own.
 
+## A Model of Your Own
+
+The daemon is configured the way everything in Infix is: with YANG.  The
+model lives in `yang/example-hello@2026-08-26.yang` and is a container
+with two leaves — `audience`, which you set, and `greetings`, which the
+daemon reports.  It is loaded into sysrepo when the image is built, see
+`package/hello-world/hello-world.mk`.
+
+That is the entire integration.  There is no CLI code for it, because
+configure mode is generated from whatever models sysrepo has loaded:
+
+```
+example-os:~$ configure
+example-os:/config/> set hello audience there
+example-os:/config/> leave
+example-os:~$ show hello
+audience:  there
+greetings: 4
+```
+
+Tab completion, help texts, validation, `show`, `diff`, saving to
+startup-config — all of it follows from the model.  The same data is
+reachable over NETCONF and RESTCONF, again for free.
+
+Only the last command needed writing: `show` in operational mode is an
+ordinary CLI command, so the spin drops a klish snippet into
+`board/common/rootfs/etc/klish/hello.xml` to add it.
+
+On the daemon side, two sysrepo subscriptions are all that is needed —
+one to hear about `audience` changing, one to answer for `greetings`.
+See `src/hello-world/hello-world.c`, it is about thirty lines of it.
+
 ## Test
 
 Infix comes with a test harness that boots the image in QEMU and pokes
@@ -97,5 +131,7 @@ images.
 ## Learn More
 
   * [Infix documentation](https://kernelkit.org/)
+  * [RFC 7950](https://www.rfc-editor.org/rfc/rfc7950), the YANG 1.1
+    language
   * [Buildroot br2-external manual](https://buildroot.org/downloads/manual/manual.html#outside-br-custom)
   * [finit](https://github.com/troglobit/finit)
