@@ -71,10 +71,16 @@ jobs:
         if: always()
         run: cat infix/test/.log/last/result-gh.md >> $GITHUB_STEP_SUMMARY
 
-      # Lands in output/images/, uploaded with the rest below.
       - name: Test Report x86_64
         if: always()
         run: make test-report
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: output/images/test-report.pdf
 
       # Also on failure, so a retry keeps what did get fetched.
       - name: Save Downloads
