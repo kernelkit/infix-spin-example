@@ -135,8 +135,10 @@ make test-report          # -> output/images/test-report.pdf
 ```
 
 The same commands run in CI, on a stock GitHub runner, see
-`.github/workflows/build.yml`.  The report is uploaded along with the
-images.
+`.github/workflows/build.yml`.  Every run uploads the report; a bootable
+image is a few hundred MB, more than a free account's artifact storage
+will take on every push, so that one is built on demand with the "Run
+workflow" button.
 
 ## Learn More
 

@@ -81,6 +81,7 @@ jobs:
         with:
           name: test-report
           path: output/images/test-report.pdf
+          retention-days: 7
 
       # Also on failure, so a retry keeps what did get fetched.
       - name: Save Downloads
@@ -97,9 +98,14 @@ jobs:
           path: .ccache/
           key: ccache-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - name: Upload Images
-        if: always()
+      # Just what `make run` boots, on demand, to stay inside the free
+      # artifact quota.
+      - name: Upload Image
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v7
         with:
           name: example-os-x86_64
-          path: output/images/
+          path: |
+            output/images/*.qcow2
+            output/images/OVMF.fd
+          retention-days: 7
