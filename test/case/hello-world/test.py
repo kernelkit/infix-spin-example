@@ -26,8 +26,13 @@ with infamy.Test() as test:
             test.fail()
 
     with test.step("Verify the daemon greets the default audience"):
-        # Nothing has been configured, so the daemon is running on the
-        # default from the YANG model.
+        # Nothing has been configured, so this is the factory default
+        # the overlay ships, see board/common/rootfs/usr/share/confd/
+        running = target.get_config_dict("/example-hello:hello")
+        print(running)
+        if running["hello"]["audience"] != "world":
+            test.fail()
+
         infamy.until(lambda: tgtssh.runsh("sudo grep -q 'Hello world!' /var/log/syslog",
                                           check=False).returncode == 0)
 

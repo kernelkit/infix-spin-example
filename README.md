@@ -16,8 +16,8 @@ on top:
     this repo and supervised by finit (`package/`, `src/`)
   * **Models** — a YANG model for that daemon, which is all it takes to
     get it into the CLI, NETCONF, and RESTCONF (`yang/`)
-  * **Files** — a rootfs overlay for service settings and a CLI snippet
-    (`board/common/rootfs/`)
+  * **Files** — a rootfs overlay for service settings, a CLI snippet, and
+    a factory default (`board/common/rootfs/`)
   * **Tests** — a regression test for the daemon, run in QEMU by Infix's
     test harness (`test/`)
 
@@ -94,6 +94,16 @@ reachable over NETCONF and RESTCONF, again for free.
 Only the last command needed writing: `show` in operational mode is an
 ordinary CLI command, so the spin drops a klish snippet into
 `board/common/rootfs/etc/klish/hello.xml` to add it.
+
+A `default` in the model is not the same as a starting configuration.
+The daemon reads `world` whether or not anything is set, but a leaf that
+still holds its default is left out when the datastore is serialized, so
+`show hello` prints nothing for it.  To make it visible, ship it as real
+configuration: Infix collates the factory config from
+`/usr/share/confd/factory.d/`, so the overlay drops a `50-hello.json`
+there, and symlinks it into `test.d/` beside it, which is where the
+image boots from under the test harness.  Anything a spin wants in a
+factory fresh configuration goes the same way.
 
 On the daemon side, two sysrepo subscriptions are all that is needed —
 one to hear about `audience` changing, one to answer for `greetings`.

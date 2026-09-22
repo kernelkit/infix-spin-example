@@ -34,8 +34,14 @@ module example-hello {
       default "world";
       description
         "Who to greet.  The daemon logs 'Hello <audience>!' to the system
-         log once a minute.  Being a leaf with a default, it needs no
-         entry in the startup configuration to have a value.";
+         log once a minute.
+
+         A default is not the same as a starting configuration.  The
+         daemon reads 'world' here whether or not anything is set, but a
+         leaf still holding its default is left out when the datastore is
+         serialized, so 'show hello' would print nothing for it.  The
+         snippets in board/common/rootfs/usr/share/confd/ set it for
+         real, which is what makes it visible.";
     }
 
     leaf greetings {
