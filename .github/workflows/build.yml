@@ -3,6 +3,7 @@ name: Build & Test
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -10,6 +11,8 @@ jobs:
   x86_64:
     name: ExampleOS x86_64
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -109,3 +112,14 @@ jobs:
             output/images/*.qcow2
             output/images/OVMF.fd
           retention-days: 7
+
+      # Artifacts expire after 90 days at most, release assets never do.
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --generate-notes \
+            output/images/*.qcow2 \
+            output/images/OVMF.fd \
+            output/images/test-report.pdf

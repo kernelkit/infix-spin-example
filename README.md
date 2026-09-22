@@ -138,7 +138,8 @@ The same commands run in CI, on a stock GitHub runner, see
 `.github/workflows/build.yml`.  Every run uploads the report; a bootable
 image is a few hundred MB, more than a free account's artifact storage
 will take on every push, so that one is built on demand with the "Run
-workflow" button.
+workflow" button.  Push a `v*` tag and both are attached to a GitHub
+release instead, where they are kept indefinitely.
 
 ## Learn More
 
