@@ -13,6 +13,7 @@ export LOGO := $(CURDIR)/doc/logo.png[top=40%, align=right, pdfwidth=10cm]
 O      ?= $(CURDIR)/output
 config := $(O)/.config
 bmake   = $(MAKE) -C infix/buildroot O=$(O) $1
+imake   = $(MAKE) -C infix O=$(O) $1
 
 all: $(config) infix/buildroot/Makefile
 	@+$(call bmake,$@)
@@ -32,16 +33,17 @@ $(config):
 # Explicit rule, since the catch-all below would find the test/ directory
 # and think there is nothing to do.
 test: | infix/buildroot/Makefile
-	@+$(call bmake,$@)
+	@+$(call imake,$@)
 
 # Render the result of the last `make test` as output/images/test-report.pdf.
 # Needs asciidoctor-pdf: gem install asciidoctor-pdf
 test-report: | infix/buildroot/Makefile
-	@+$(call bmake,$@)
+	@+$(call imake,$@)
 
-# Any other target (menuconfig, clean, ...) is passed to Buildroot.
+# Any other target (menuconfig, clean, migrate-configs, ...) is passed to
+# Infix, which handles its own targets and forwards the rest to Buildroot.
 %: | infix/buildroot/Makefile
-	@+$(call bmake,$@)
+	@+$(call imake,$@)
 
 infix/buildroot/Makefile:
 	@git submodule update --init --recursive
