@@ -27,19 +27,13 @@ and you have your own OS.
 
 ## Get Started
 
-Clone the repository along with its submodules, and install the tools
-Buildroot needs:
+Install the build dependencies listed in the [Infix Developer's
+Guide][building], for the Infix release this spin is based on, then
+clone the repository along with its submodules:
 
 ```bash
 git clone --recurse-submodules https://github.com/kernelkit/infix-spin-example.git
 cd infix-spin-example
-
-sudo apt install bc binutils build-essential bzip2 cpio \
-                 diffutils file findutils git gzip      \
-                 libncurses-dev libssl-dev perl patch   \
-                 python3 rsync sed tar unzip wget       \
-                 autopoint bison flex autoconf automake \
-                 mtools
 ```
 
 Configure and build.  The first build takes a while, since it compiles
@@ -148,3 +142,5 @@ release instead, where they are kept indefinitely.
     language
   * [Buildroot br2-external manual](https://buildroot.org/downloads/manual/manual.html#outside-br-custom)
   * [finit](https://github.com/troglobit/finit)
+
+[building]: https://www.kernelkit.org/infix/26.06/developers-guide/#building
