@@ -48,13 +48,11 @@ test-report: | infix/buildroot/Makefile
 infix/buildroot/Makefile:
 	@git submodule update --init --recursive
 
-# Regenerate configs/ from Infix's defconfigs + our snippets.  Run this
-# after editing anything in config-snippets/, and commit the result.
-defconfigs-generate: infix/buildroot/Makefile
-	./infix/utils/generate-defconfig.sh \
-		-b infix/configs/x86_64_defconfig \
-		-c config-snippets/common.conf \
-		-c config-snippets/x86_64.conf \
-		-o configs/x86_64_defconfig
+# configs/*.base. YES=1 follows Infix on everything
+sync = ./infix/utils/update-defconfig.sh $(if $(YES),-y)
+
+# Regenerate configs/
+defconfigs-update:
+	@$(sync) infix/configs/x86_64_defconfig configs/x86_64_defconfig
 
 .PHONY: all test test-report defconfigs-generate
