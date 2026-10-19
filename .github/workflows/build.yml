@@ -1,0 +1,125 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  x86_64:
+    name: ExampleOS x86_64
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            bc binutils build-essential bzip2 cpio \
+            diffutils file findutils git gzip \
+            libncurses-dev libssl-dev perl patch \
+            python3 rsync sed tar unzip wget \
+            autopoint bison flex autoconf automake \
+            mtools
+
+      - name: Install asciidoctor-pdf
+        run: sudo gem install --no-document asciidoctor-pdf
+
+      # Full history, the OS version comes from `git describe` here.
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      # Keeps codeload.github.com from rate limiting the build.
+      - name: Restore Downloads
+        uses: actions/cache/restore@v5
+        with:
+          path: dl/
+          key: dl-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: dl-
+
+      - name: Restore ccache
+        uses: actions/cache/restore@v5
+        with:
+          path: .ccache/
+          key: ccache-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ccache-
+
+      - name: Configure x86_64
+        run: make x86_64_defconfig
+
+      - name: Build x86_64
+        run: make
+
+      - name: Test x86_64
+        run: make test
+
+      - name: Publish Test Result
+        if: always()
+        run: cat infix/test/.log/last/result-gh.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Test Report x86_64
+        if: always()
+        run: make test-report
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-report
+          path: output/images/test-report.pdf
+          retention-days: 7
+
+      # Also on failure, so a retry keeps what did get fetched.
+      - name: Save Downloads
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: dl/
+          key: dl-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: .ccache/
+          key: ccache-${{ github.run_id }}-${{ github.run_attempt }}
+
+      # Just what `make run` boots, on demand, to stay inside the free
+      # artifact quota.
+      - name: Upload Image
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v7
+        with:
+          name: example-os-x86_64
+          path: |
+            output/images/*.qcow2
+            output/images/OVMF.fd
+          retention-days: 7
+
+      # Artifacts expire after 90 days at most, release assets never do.
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --generate-notes \
+            output/images/*.qcow2 \
+            output/images/OVMF.fd \
+            output/images/test-report.pdf

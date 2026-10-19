@@ -1,0 +1,27 @@
+// Logical topology required by this test: one DUT reachable over a
+// management link.  Infamy maps it onto whatever physical topology the
+// test environment provides, so the same test runs in QEMU or on real
+// hardware without changes.
+graph "1x1" {
+	layout="neato";
+	overlap="false";
+	esep="+80";
+
+	node [shape=record, fontname="DejaVu Sans Mono, Book"];
+	edge [color="cornflowerblue", penwidth="2", fontname="DejaVu Serif, Book"];
+
+	host [
+	    label="host | { <mgmt> mgmt }",
+	    pos="0,12!",
+	    requires="controller",
+	];
+
+	target [
+	    label="{ <mgmt> mgmt } | target",
+	    pos="10,12!",
+
+	    requires="infix",
+	];
+
+	host:mgmt -- target:mgmt [requires="mgmt", color="lightgray"]
+}

@@ -1,0 +1,15 @@
+config BR2_PACKAGE_HELLO_WORLD
+	bool "hello-world"
+	depends on BR2_PACKAGE_CONFD
+	help
+	  Example daemon for the spin: logs a greeting to syslog
+	  once a minute.  Started by finit, see
+	  board/common/rootfs/etc/finit.d/available/hello-world.conf
+
+	  Takes its configuration from the example-hello YANG model
+	  in yang/, and publishes a greeting counter as operational
+	  data, so it can be driven from the CLI, NETCONF, and
+	  RESTCONF without any glue of its own.
+
+comment "hello-world needs confd, for sysrepo and the YANG datastore"
+	depends on !BR2_PACKAGE_CONFD

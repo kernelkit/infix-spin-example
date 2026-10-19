@@ -1,0 +1,6 @@
+# Tell 9pm which project it is testing.  Paths are relative to the 9pm
+# submodule, infix/test/9pm/, so "../../../" is the root of this spin.
+9pm:
+  PROJECT-NAME: "ExampleOS"
+  PROJECT-ROOT: "../../../"
+  PROJECT-TOPDOC: "../case/"
